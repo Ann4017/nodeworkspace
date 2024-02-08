@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            .line {
+                overflow: hidden;
+            }
+            .seat {
+                float: left;
+                width: 30px;
+                height: 30px;
+                border-radius: 3px;
+                margin: 2px;
+                background-color: white;
+            }
+            .enable {
+                background-color: gray;
+            }
+            .disable {
+                background-color: red;
+            }
+        </style>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            let socket = io.connect();
+
+            socket.on("reserve", (data) => {
+                let $target = $(
+                    "div[data-x = " + data.x + "][data-y = " + data.y + "]"
+                );
+                $target.removeClass("enable").addClass("disable");
+            });
+        </script>
+        <script>
+            $(function () {
+                let onClickSeat = function () {
+                    let x = $(this).attr("data-x");
+                    let y = $(this).attr("data-y");
+
+                    if (confirm("좌석을 예약하시겠습니까?")) {
+                        $(this).off("click"); // 해당 요소 이벤트 제거
+                        socket.emit("reserve", {
+                            x: x,
+                            y: y,
+                        });
+                    } else {
+                        alert("취소 되었습니다.");
+                    }
+                };
+
+                // ajax
+                $.getJSON(
+                    "/seats",
+                    { dummy: new Date().getTime() },
+                    function (data) {
+                        $.each(data, function (idxY, line) {
+                            let $line = $("<div></div>").addClass("line");
+                            $.each(line, function (idxX, seat) {
+                                let $output = $("<div></div>", {
+                                    class: "seat",
+                                    "data-x": idxX,
+                                    "data-y": idxY,
+                                }).appendTo($line);
+
+                                if (seat == 1) {
+                                    $output
+                                        .addClass("enable")
+                                        .on("click", onClickSeat);
+                                } else if (seat == 2) {
+                                    $output.addClass("disable");
+                                }
+                            });
+                            $line.appendTo("body");
+                        });
+                    }
+                );
+            });
+        </script>
+    </head>
+    <body></body>
+</html>
