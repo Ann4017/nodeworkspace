@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="result"></div>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            const reqUrl = "http://localhost:8080/board/";
+            const apiKey = encodeURI("0B7RW4Q-8FY4FR6-Q7D4YGX-NTZ3CDC/");
+            const params = "search?keyword=하이";
+
+            const url = reqUrl + apiKey + params;
+
+            axios
+                .get(url)
+                .then((result) => {
+                    document.getElementById("result").textContent =
+                        JSON.stringify(result.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        </script>
+    </body>
+</html>
